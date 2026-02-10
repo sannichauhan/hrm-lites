@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
-
+import os
+from urllib.parse import urlparse
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -97,11 +98,19 @@ WSGI_APPLICATION = "HRM_lite.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
+DATABASE_URL = "postgresql://hrm_db_crrj_user:Ghm401268ZdC8ry3VDOOBCcTsdpwiSWQ@dpg-d6599063jp1c73akbg10-a.singapore-postgres.render.com/hrm_db_crrj"
+url = urlparse(DATABASE_URL)
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+            "NAME": url.path[1:],  # remove leading /
+            "USER": url.username,
+            "PASSWORD": url.password,
+            "HOST": url.hostname,
+            "PORT": url.port,
+            "OPTIONS": {
+                "sslmode": "require",  # REQUIRED on Render
+            },
     }
 }
 
